@@ -11,7 +11,9 @@ async function bootstrap() {
     .setTitle('Minha Lista')
     .setDescription('This is the Api to the my list system')
     .setVersion('1.0')
-    .addTag('Minha Lista')
+    .addTag('user')
+    .addTag('auth')
+    .addBearerAuth()
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
