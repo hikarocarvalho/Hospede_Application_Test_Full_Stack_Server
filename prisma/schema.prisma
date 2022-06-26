@@ -13,7 +13,7 @@ datasource db {
 model DbUsers{
   id            Int         @default(autoincrement()) @id
   userName      String
-  email         String
+  email         String      @unique()
   password      String
   created_at    DateTime     @default(now())
   updated_at    DateTime?
