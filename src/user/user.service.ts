@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { handleError } from 'src/utils/handle-error.util';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -26,32 +27,49 @@ export class UserService {
         ...createUserDto,
         password: await bcrypt.hash(createUserDto.password,10),
       }
-    }).catch(error=>error);
+    }).catch(handleError);
   }
 
-  findAll() : Promise <User[]> {
-    return this.prisma.dbUsers.findMany({
+  async findAll() : Promise <User[]> {
+    const users = await this.prisma.dbUsers.findMany({
       select:this.userResultData,
       where:{
         deleted_at: null
       }
-    }).catch(error=>error);
-  }
+    });
 
-  findOne(id: number) : Promise <User> {
-    return this.prisma.dbUsers.findFirst({
+    if(!users){
+      throw new NotFoundException("Any registered users");
+    }
+
+    return users;
+  }
+  async findOne(id: number) : Promise <User> {
+    const user = await this.prisma.dbUsers.findFirst({
       select:this.userResultData,
       where:{
         id: id,
         deleted_at: null,
       }
-    }).catch(error=>error);
+    });
+
+    if(!user){
+      throw new NotFoundException("The user with id = " + id + " not found!")
+    }
+
+    return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) : Promise <User>{
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const verifyUser = await this.prisma.dbUsers.findUnique({where:{id}});
+    if(!verifyUser){
+      throw new NotFoundException("The user with id = " + id + " not found!");
+    }
+    
     if(updateUserDto.password){
       updateUserDto.password = await bcrypt.hash(updateUserDto.password,10);
     }
+
     return this.prisma.dbUsers.update({
       select:this.userResultData,
       data:{
@@ -61,10 +79,16 @@ export class UserService {
       where:{
         id
       }
-    }).catch(error=>error);
+    }).catch(handleError);
   }
 
-  remove(id: number) : Promise <User>{
+  async remove(id: number) : Promise <User>{
+    const verifyUser = await this.prisma.dbUsers.findUnique({where:{id}});
+
+    if(!verifyUser){
+      throw new NotFoundException("The user with id = " + id + " not found!")
+    }
+
     return this.prisma.dbUsers.update({
       select:this.userResultData,
       data:{
@@ -73,6 +97,6 @@ export class UserService {
       where:{
         id
       }
-    }).catch(error=> error);
+    });
   }
 }
