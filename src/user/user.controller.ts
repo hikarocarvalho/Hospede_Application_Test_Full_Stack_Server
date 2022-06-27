@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,7 +20,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({
-    description: "This end point create a new user."
+    description: 'This end point create a new user.',
   })
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -19,7 +28,7 @@ export class UserController {
   }
 
   @ApiOperation({
-    description: "This end point get all users."
+    description: 'This end point get all users.',
   })
   @UseGuards(AuthGuard())
   @ApiBearerAuth()
@@ -29,7 +38,7 @@ export class UserController {
   }
 
   @ApiOperation({
-    description: "This end point get one user."
+    description: 'This end point get one user.',
   })
   @UseGuards(AuthGuard())
   @ApiBearerAuth()
@@ -39,7 +48,7 @@ export class UserController {
   }
 
   @ApiOperation({
-    description: "This end point update the data values from one user."
+    description: 'This end point update the data values from one user.',
   })
   @UseGuards(AuthGuard())
   @ApiBearerAuth()
@@ -49,7 +58,7 @@ export class UserController {
   }
 
   @ApiOperation({
-    description: "This end point delete one user."
+    description: 'This end point delete one user.',
   })
   @UseGuards(AuthGuard())
   @ApiBearerAuth()
